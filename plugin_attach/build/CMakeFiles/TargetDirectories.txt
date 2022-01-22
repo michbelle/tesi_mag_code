@@ -1,0 +1,3 @@
+/code_tesi/plugin_attach/build/CMakeFiles/rebuild_cache.dir
+/code_tesi/plugin_attach/build/CMakeFiles/edit_cache.dir
+/code_tesi/plugin_attach/build/CMakeFiles/concatenaria_force.dir
