@@ -26,9 +26,6 @@
 
 
 
-#include <typeinfo>
-
-
 
 using gazebo::concatenaria_plugin;
 GZ_REGISTER_WORLD_PLUGIN(concatenaria_plugin)
@@ -39,14 +36,14 @@ GZ_REGISTER_WORLD_PLUGIN(concatenaria_plugin)
 
 concatenaria_plugin::concatenaria_plugin()
 {
-  printf("\nCostruction of PlugTeleop!\n");
+  printf("\nCostruction of concatenaria plugin!\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 concatenaria_plugin::~concatenaria_plugin()
 {
-  printf("\nShutdown PlugTeleop!\n");
+  printf("\nShutdown concatenaria plugin!\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +73,17 @@ void concatenaria_plugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf){
 
 void concatenaria_plugin::OnUpdate()
 {
-
+  
   auto list_pointer = this->world->Models();
+  for (auto n : list_pointer){
+      printf( "\t%s",n->GetName().c_str());
+    }
+  printf("\n");
+  
+  /*
   auto drone0 = &list_pointer[0];
   std::cout << typeid(drone0).name() << std::endl;
+  */
 
   /* test code for see the names of parts of the drone and nest
   if(this->drone!=NULL && this->nest!=NULL){
