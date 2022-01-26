@@ -32,7 +32,7 @@ GZ_REGISTER_WORLD_PLUGIN(concatenaria_plugin)
 
 
 
-    /////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 
 concatenaria_plugin::concatenaria_plugin()
 {
@@ -64,31 +64,39 @@ void concatenaria_plugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf){
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(std::bind(&concatenaria_plugin::OnUpdate, this));
 
 }
-/* 
-array::Vector 2*[6] calculate_force(auto model1, auto model2, ignition::math::Vector3d pose_attachment_concatenaria ){
+
+void concatenaria_plugin::calculate_force(ignition::math::Pose3d pose_1, ignition::math::Pose3d pose_2){
   
-  ignition::Pose3d model1_pose = model1->getPose();
-  ignition::Pose3d model2_pose = model2->getPose();
-  attachment_pose1 = model1_pose +  pose_attachment_concatenaria;
-  attachment_pose2 = model2_pose +  pose_attachment_concatenaria;
+  auto position_xyz_1 = pose_1.Pos();
+  auto position_xyz_2 = pose_2.Pos();
+
+  /*common::Time*/
+  double time = this->world->RealTime().Double(); //SimTime ()
+  printf("the time now is %f", time);
   
-  modello_concatenaria
-  return force_1_model and force_2_model
+
+  //modello_concatenaria
+  //return force_1_model and force_2_model
+
+  
 
   //scomposizione delle forze normali al piano e coppie generate rispetto al centro di massa (se no creare il proprio modello ed evitare questo)
-
+  /*
   for x,y,z:
   if distanza tra attachemnt e centro di massa drone > 0 allora la forza è una coppia {
      coppia = i * distanza (attachement, pose)
      i=0
 
   }
-  return force_torque = 2*{0,0,0,0,0,0};
+  */
+  
+  this->ft_drone1.forces={0,13,0};
+  this->ft_drone1.torques={0,13,0};
+  this->ft_drone2.forces={0,0,25};
+  this->ft_drone2.torques={0,0,0};
 }
 
-array::Vector this->force_torque=2*{0,0,0,0,0,0};
-ignition::vector3d this->attachment_pose;
-*/
+
 
 
 
@@ -99,65 +107,53 @@ void concatenaria_plugin::OnUpdate(){
   //check code to see the names of models inside the simulation
   
   auto list_pointer = this->world->Models();
+  /*
   for (auto n : list_pointer){
       printf( "\t%s",n->GetName().c_str());
       this->counter_trash_0 ++;
     }
   printf("\n");
-  
-  this->drone0 = this->world->ModelByName("iris0");
-  this->drone1 = this->world->ModelByName("iris1");
+  */
+
+  this->drone0 = this->world->ModelByName(this->name_0_drone);
+  this->drone1 = this->world->ModelByName(this->name_1_drone);
 
   if (this->drone0 != NULL && this->drone1 != NULL){
 
+    /*
     //check the names of links
     auto list_pointers_link_drones = this->drone0->GetLinks();
     for (auto n : list_pointers_link_drones){
       printf( "\t%s",n->GetName().c_str());
     }
     printf("\n");
-
-    /*
-    forces_torques = calculate_force(this->drone0,this->drone1,this->attachment_pose);
-
-    ignition::math::Vector3d 
-    
-    this->drone0_link = this->drone->GetLink(this->drone0_name_centerofmass = "base_link")
-
-    this->drone0_link->AddRelativeForce();
-    this->drone0_link->AddRelativeTorque();
     */
+
+    //take the center of mass that is located in base link
+
+    this->link_drone_0 =  this->drone0->GetChildLink(this->name_link);
+    this->link_drone_1 =  this->drone1->GetChildLink(this->name_link);
+
+
+    // TODO it is right? need to check or add a link equal at the attachment distance and then solve using that end of the link (the center of this link has to be at the attachemnt position then move the center of mass/visual/collition to the position of the real center)
+    //auto pose_attach_first_0 = this->link_drone_0->getPose().CoordPositionAdd(this->pose_attachment_relative_base);
+    //auto pose_attach_first_1 = this->link_drone_1->getPose().CoordPositionAdd(this->pose_attachment_relative_base);
+    auto pose_attach_first_0 = this->link_drone_0->WorldPose();
+    auto pose_attach_first_1 = this->link_drone_1->WorldPose();
+
+
+    this->calculate_force(pose_attach_first_0,pose_attach_first_1);
+    
+
+
+    this->link_drone_0->AddRelativeForce(this->ft_drone1.forces);
+    this->link_drone_0->AddRelativeTorque(this->ft_drone1.torques);
+
+    this->link_drone_1->AddRelativeForce(this->ft_drone1.forces);
+    this->link_drone_1->AddRelativeTorque(this->ft_drone1.torques);
+    
     
   }
-
-
-  /*
-  auto drone0 = &list_pointer[0];
-  std::cout << typeid(drone0).name() << std::endl;
-  */
-
-  /* test code for see the names of parts of the drone and nest
-  if(this->drone!=NULL && this->nest!=NULL){
-    auto test1 = this->drone->GetLinks();
-    auto test2 = this->nest->GetLinks();
-    printf("scan drone links");
-    
-    
-    for (auto n : test1){
-      printf("\t");
-      printf( n->GetName().c_str());
-    }
-    printf("\n");
-
-    for (auto n : test2){
-      printf("\t");
-      printf( n->GetName().c_str());
-    }
-
-    printf("\n\n\n\n\n");
-  }
-  
- */
 
 
   

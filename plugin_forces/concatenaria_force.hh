@@ -45,6 +45,9 @@ namespace gazebo
         /// \brief function that is called every iteration of simulation
         public: void OnUpdate();
 
+        /// \brief function calc the concatenarian forces
+        public: void calculate_force(ignition::math::Pose3d pose_1, ignition::math::Pose3d pose_2);
+
         /*******************************************************************************************/
 
         //define variable for world and models 
@@ -54,5 +57,35 @@ namespace gazebo
 
         //used for update at each iteration
         private: event::ConnectionPtr updateConnection;
+
+        //distance between base_link and cable attach
+        //private: ignition::math::Vector3 pose_attachment_relative_base = ignition::math::Vector3(0,0,0.01);
+
+        //force for 1 attachment
+        struct forces_torque {
+            ignition::math::Vector3<double> forces;
+            ignition::math::Vector3<double> torques;
+        };
+        private: forces_torque ft_drone1;
+        private: forces_torque ft_drone2;
+
+        /*
+
+        struct drone{
+            physics::ModelPtr model;
+            struct forces_torques;
+            std::array<double,3>
+        }
+
+        */
+
+        //link used 
+        private: physics::LinkPtr link_drone_0;
+        private: physics::LinkPtr link_drone_1;
+
+        //names of things
+        private: std::string name_link = "base_link";
+        private: std::string name_0_drone = "iris0";
+        private: std::string name_1_drone = "iris1";
     };
 }
